@@ -2,6 +2,9 @@
 	import { onMount } from 'svelte';
 	import FetchData from '../../../utils/FetchData';
 	import { VITE_API_KEY, VITE_API_AUTHORIZATION } from '../../../utils/env';
+	import ModalEditProduct from './ModalEditProduct.svelte';
+
+
 
 	export let datos: any[] = [];
 	export let loading = true;
@@ -12,8 +15,11 @@
 	let stockFilter: 'Todos' | 'En stock' | 'Sin stock' = 'Todos';
 	let searchQuery = '';
 	let currentPage = 1;
+	let idProduct = 0;
+
 	let selectedCategory = 'Todos';
 	let categories: any[] = [];
+	let showModal = false;
 
 	const getClients = async () => {
 		const responseClients = await FetchData(
@@ -74,7 +80,7 @@
 				}
 				return true;
 			});
-
+	
 		const paginatedData = filteredData.slice(
 			(currentPage - 1) * itemsPerPage,
 			currentPage * itemsPerPage
@@ -83,8 +89,10 @@
 		return { filteredData, paginatedData };
 	}
 
+	
 	function getTotalPages() {
 		const { filteredData } = getFilteredAndPaginatedData();
+		
 		return Math.ceil(filteredData.length / itemsPerPage);
 	}
 
@@ -93,9 +101,43 @@
 			currentPage = newPage;
 		}
 	}
+	const changeModalSho = () => {
+		console.log("XX")
+		showModal = true
+	}
+	const changeModalClose = () => {
+		console.log("YY")
+		showModal = false
+	}
+	const getIdProduct = (id: number) => {
+		console.log("evv")
+		idProduct = id;
+		changeModalSho()
+	}
+	const deleteIdProduct = async (id: number) => {
+
+
+		const deleteProduct = await FetchData(
+			`https://eelkfypaxjhdnroismga.supabase.co/rest/v1/product?id=eq.${id}`,
+			{
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json',
+					apikey: VITE_API_KEY,
+					Authorization: VITE_API_AUTHORIZATION,
+					Prefer: 'return=representation'
+				}
+			}
+		);
+		console.log("id", id)
+
+		console.log("deleteProduct", deleteProduct)
+	}
+	
 </script>
 
 <div class="container mx-auto px-4 sm:px-8">
+
 	<div class="py-8">
 		<div>
 			<h2 class="text-2xl font-semibold leading-tight">Productos</h2>
@@ -105,7 +147,7 @@
 			<div class="mb-1 flex flex-row rounded-lg border-r-2 sm:mb-0">
 				<div class="relative">
 					<select
-						class="block h-full w-full appearance-none rounded-l-lg border border-purple-700 bg-white px-4 py-2 pr-8 leading-tight text-gray-700 focus:border-yellow-700 focus:bg-white focus:outline-none"
+						class="block h-full w-full appearance-none rounded-l-lg border border-purple-700  bg-white px-4 py-2 pr-8 leading-tight text-gray-700 focus:border-yellow-700 focus:bg-white focus:outline-none"
 						bind:value={itemsPerPage}
 					>
 						<option value="3">3</option>
@@ -128,7 +170,7 @@
 				</div>
 				<div class="relative">
 					<select
-						class="block h-full w-full appearance-none rounded-r border-b border-r border-t border-purple-700 bg-white px-4 py-2 pr-8 leading-tight text-gray-700 focus:border-l focus:border-r focus:border-yellow-700 focus:bg-white focus:outline-none sm:rounded-r-none sm:border-r-0"
+						class="block h-full w-full appearance-none rounded-r border-l border-b border-r border-t  border-purple-700 bg-white px-4 py-2 pr-8 leading-tight text-gray-700 focus:border-l focus:border-r focus:border-yellow-700 focus:bg-white focus:outline-none sm:rounded-r-none sm:border-r-0"
 						bind:value={stockFilter}
 					>
 						<option value="Todos">Todos</option>
@@ -154,6 +196,7 @@
 						class="block h-full w-full appearance-none rounded-r border-b border-r border-t border-purple-700 bg-white px-4 py-2 pr-8 leading-tight text-gray-700 focus:border-l focus:border-r focus:border-yellow-700 focus:bg-white focus:outline-none sm:rounded-r-none sm:border-r-0"
 						bind:value={selectedCategory}
 					>
+					<option value="Todos">Todas las categorias</option>
                     {#each categories as category}
                     <option value={category.name}>{category.name}</option>
                 {/each}
@@ -242,6 +285,7 @@
 									stock: item.stock,
                                     categoria: item.categoryName,
 									fecha: item.createDate,
+									id: item.id
 								})}
 							{/each}
 						</tbody>
@@ -278,7 +322,9 @@
 		{/if}
 	</div>
 </div>
-
+{#if showModal === true}
+    <ModalEditProduct callback={changeModalClose} categories={categories} idProduct={idProduct} />
+  {/if}
 {#snippet tableTemplate({
 	url,
 	img,
@@ -286,7 +332,8 @@
 	fecha,
 	stock,
     categoria,
-	precio
+	precio,
+	id
 }: {
 	url: string;
 	img: string;
@@ -295,6 +342,7 @@
 	stock: number;
     categoria: string;
 	precio: number;
+	id:any
 })}
 	<tr>
 		<td
@@ -334,8 +382,9 @@
 		<td
 			class={`${stock === 0 ? 'bg-yellow-50' : ''} border-b border-gray-200 bg-white px-5 py-5 text-sm`}
 		>
-			<a href={url} class="ml-5 text-yellow-700 underline">Editar</a>
-			<a href={url} class="text-red-700 underline">Eliminar</a>
+			<button on:click={() => getIdProduct(id)} class="ml-5 text-yellow-700 underline">Editar</button>
+			<button on:click={() => deleteIdProduct(id)} class="text-red-700 underline">Eliminar</button>
+
 		</td>
 	</tr>
 {/snippet}

@@ -1,34 +1,38 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { goto } from '@sveltejs/kit';
 	import FetchData from '../../utils/FetchData';
-	import { VITE_API_AUTHORIZATION, VITE_API_KEY } from '../../utils/env';
+	import { VITE_API_KEY, VITE_API_AUTHORIZATION } from '../../utils/env';
+	import { goto } from '$app/navigation';
 
 	let dataForm: any = {
 		name: '',
 		precio: '',
 		stock: '',
 		descripcion: '',
-		category: '',
+		categoria: '',
 		img: ''
 	};
 
 	let categories: any[] = [];
-	let selectedCategory: string = '';
+	let successMessage = '';
+	let errorMessage = '';
 
 	const getCategories = async () => {
 		try {
 			const response = await FetchData(
-				'https://eelkfypaxjhdnroismga.supabase.co/rest/v1/categories',
+				'https://eelkfypaxjhdnroismga.supabase.co/rest/v1/category?select=*',
 				{
-					method: 'GET',
 					headers: {
 						apikey: VITE_API_KEY,
 						Authorization: VITE_API_AUTHORIZATION
 					}
 				}
 			);
-			categories = await response.json();
+			/* categories = response.body.map((category: any) => ({
+        label: category.name,
+        value: category.name
+      })); */
+			categories = response;
 		} catch (error) {
 			console.error('Error fetching categories:', error);
 		}
@@ -40,47 +44,71 @@
 
 	const sendData = async (event: Event) => {
 		event.preventDefault();
+		console.log(dataForm);
 
-		try {
-			const formData = new FormData();
-			formData.append('name', dataForm.name);
-			formData.append('description', dataForm.descripcion);
-			formData.append('price', dataForm.precio);
-			formData.append('stock', dataForm.stock);
-			formData.append('category', selectedCategory);
-			formData.append('image', dataForm.img);
+    const responseProduct = await FetchData(
+      "https://eelkfypaxjhdnroismga.supabase.co/rest/v1/product",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: VITE_API_KEY,
+          Authorization: VITE_API_AUTHORIZATION,
+          Prefer: "return=representation",
+        },
+        body: {
+					name: dataForm.name,
+					image: dataForm.img,
+					id_category: dataForm.categoria,
+					price: dataForm.precio,
+					stock: dataForm.stock,
+					description: dataForm.descripcion
+				},
+      }
+    );
 
-			const response = await fetch(
-				'https://eelkfypaxjhdnroismga.supabase.co/rest/v1/product',
-				{
-					method: 'POST',
-					headers: {
-						apikey: VITE_API_KEY,
-						Authorization: VITE_API_AUTHORIZATION,
-					},
-					body: formData
-				}
-			);
 
-			if (response.ok) {
+      console.log(responseProduct)
+
+      if (responseProduct) {
+				successMessage = 'Producto insertado correctamente.';
 				goto('/');
+
+				errorMessage = '';
 			} else {
 				const errorData = await response.json();
+				errorMessage = 'Hubo un error al insertar el producto.';
 				console.error('Error response:', errorData);
 			}
-		} catch (error) {
-			console.error('Error sending data:', error);
-		}
 	};
 
 	const handleFileChange = (event: any) => {
 		dataForm.img = event.target.files[0];
 	};
-</script>
 
+	const handleCreateCategory = (inputValue: string) => {
+		const newCategory = { label: inputValue, value: inputValue };
+		categories = [...categories, newCategory];
+		return newCategory;
+	};
+</script>
 
 <div class="flex items-center justify-center p-12">
 	<div class="mx-auto w-full max-w-[550px]">
+    <div>
+      <h2 class="text-2xl font-semibold leading-tight mb-9">Agrega un producto</h2>
+    </div>
+		{#if successMessage}
+			<p class="mb-4 rounded bg-green-100 p-3 text-green-800">
+				{successMessage}
+			</p>
+		{/if}
+		{#if errorMessage}
+			<p class="mb-4 rounded bg-red-100 p-3 text-red-800">
+				{errorMessage}
+			</p>
+		{/if}
+
 		<form on:submit|preventDefault={sendData}>
 			<div class="mb-5">
 				<label for="name" class="mb-3 block text-base font-medium">Nombre del Producto</label>
@@ -125,34 +153,32 @@
 					rows="4"
 					name="descripcion"
 					id="descripcion"
-					placeholder="Descripción del Producto"
+					placeholder="Descripción del producto"
 					class="w-full resize-none rounded-lg border border-[#e0e0e0] bg-white px-6 py-3 text-base font-medium text-[#6B7280] outline-none focus:border-yellow-700 focus:shadow-md"
 				></textarea>
 			</div>
 
 			<div class="mb-5">
-				<label for="category" class="mb-3 block text-base font-medium">Categoría</label>
+				<label for="categories" class="mb-3 block text-base font-medium">Categorías</label>
+
 				<select
-					name="category"
-					id="category"
+					bind:value={dataForm.categoria}
 					class="w-full rounded-lg border border-[#e0e0e0] bg-white px-6 py-3 text-base font-medium text-[#6B7280] outline-none focus:border-yellow-700 focus:shadow-md"
-					bind:value={selectedCategory}
 				>
 					{#each categories as category}
-						<option value={category.name}>{category.name}</option>
+						<option value={category.id}>{category.name}</option>
 					{/each}
 				</select>
 			</div>
 
 			<div class="mb-5">
-				<label for="img" class="mb-3 block text-base font-medium">Imagen</label>
+				<label for="img" class="mb-3 block text-base font-medium">Cambiar Imagen</label>
 				<input
+					on:change={handleFileChange}
 					type="file"
 					name="img"
 					id="img"
-					placeholder="Subir Imagen"
 					class="w-full rounded-lg border border-[#e0e0e0] bg-white px-6 py-3 text-base font-medium text-[#6B7280] outline-none focus:border-yellow-700 focus:shadow-md"
-					on:change={handleFileChange}
 				/>
 			</div>
 
