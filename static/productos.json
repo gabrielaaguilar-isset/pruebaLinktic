@@ -1,0 +1,58 @@
+[
+    {
+      "name": "Belleza verdadera",
+      "description": "La vida de una estudiante cambia a medida que aprende técnicas de maquillaje. Jugyeong vive escondida detrás del maquillaje de su doloroso pasado. Suho pierde la alegría por su doloroso pasado.",
+      "price": 1000,
+      "stock": 100,
+      "image": "trueBeuty.jpeg",
+      "fecha": "04/10/2024 "
+    },
+    {
+      "name": "Veinticinco, veintiuno",
+      "description": "En una época donde los objetivos parecen inalcanzables, una joven esgrimista persigue sus sueños y conoce a un joven trabajador que busca reconstruir su vida.",
+      "price": 1000,
+      "stock": 20,
+      "image": "2521kdrama.jpg",
+      "fecha": "04/10/2024 "
+    },
+    {
+      "name": "Propuesta laboral",
+      "description": "Ha-ri acepta presentarse en una cita a ciegas en lugar de una amiga para asustar al pretendiente. Pero los planes se desmoronan cuando descubre que él es su jefe y tiene una propuesta para ella.",
+      "price": 1500,
+      "stock": 0,
+      "image": "bussinesProporsal.jpg",
+      "fecha": "04/10/2024 "
+    },
+    {
+      "name": "Lovely Runner",
+      "description": "Lovely Runner es una serie de televisión surcoreana dirigida por Yoon Jong-ho y Kim Tae-yeop, y protagonizada por Byeon Woo-seok, Kim Hye-yoon, Song Geon-hee y Lee Seung-hyub. Está basada en una novela web del mismo título original, escrita por Kim Bbang, y que también fue adaptada como webtoon.",
+      "price": 1500,
+      "stock": 50,
+      "image": "lovelyrunner.jpg",
+      "fecha": "04/10/2024 "
+    },
+    {
+      "name": "Nos vemos en mi 19.ª vida",
+      "description": "Ban Ji-eum, que puede recordar todas sus vidas pasadas, se propone reencontrarse con un amor perdido de su 18ª vida, trágicamente truncada.",
+      "price": 1500,
+      "stock": 50,
+      "image": "nosVemosEn19Vida.jpg",
+      "fecha": "04/10/2024 "
+    },
+    {
+      "name": "Cásate con mi esposo",
+      "description": "Cuando una mujer presencia la aventura entre su mejor amiga y su marido, y es asesinada por ellos, retrocede en el tiempo para cambiar su futuro y buscar venganza.",
+      "price": 1500,
+      "stock": 50,
+      "image": "marryMyHusband.jpeg",
+      "fecha": "04/10/2024 "
+    },
+    {
+      "name": "¿Qué le ocurre a la secretaria Kim?",
+      "description": "Un ejecutivo narcisista se involucra de manera romántica con su secretaria luego de mantener una relación profesional durante nueve años.",
+      "price": 1500,
+      "stock": 50,
+      "image": "queLeOcurreALaSecretariaKim.jpg",
+      "fecha": "04/10/2024 "
+    }
+  ]
